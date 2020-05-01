@@ -16,13 +16,17 @@
     <script>
         let connectionID;
         let myID;
+        let lastMsg;
 
         function rec(){
             peer.on('connection', function(conn) {
                 conn.on('data', function(data){
                     let txt = document.createElement("p");
                     txt.innerHTML = data;
-                    document.body.appendChild(txt);
+                    if (lastMsg != data){
+                        document.body.appendChild(txt);
+                    }
+                    lastMsg = data;
                 });
             });
         }
