@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/peerjs@1.0.0/dist/peerjs.min.js"></script>
+    <title>p2pChat</title>
+</head>
+<body>
+    <p id="id"></p>
+    <input type="text" id="textInput">
+    <button onclick="connect()">connect</button>
+    <br/>
+    <textarea type="text" id="msg"></textarea>
+    <button onclick="sendMsg()">send</button>
+    <script>
+        let connectionID;
+        let myID;
+
+        function rec(){
+            peer.on('connection', function(conn) {
+                conn.on('data', function(data){
+                    let txt = document.createElement("p");
+                    txt.innerHTML = data;
+                    document.body.appendChild(txt);
+                });
+            });
+        }
+
+        function connect(){
+            connectionID = document.getElementById("textInput").value;
+            let conn = peer.connect(connectionID);
+            rec();
+        }
+
+        function sendMsg() {
+            let date = new Date();
+            let conn = peer.connect(connectionID);
+            conn.on('open', function(){
+                conn.send(`${document.getElementById("msg").value} - ${date.getHours()}:${date.getMinutes()}`);
+            });
+            let txt = document.createElement("p");
+            txt.innerHTML = `${document.getElementById("msg").value} - ${date.getHours()}:${date.getMinutes()}`;
+            txt.setAttribute("id", "sent");
+            document.body.appendChild(txt);
+        }
+
+        let peer = new Peer();
+        peer.on('open', (id) => {
+            document.getElementById("id").innerHTML = `Your ID is: ${id}`;
+            myID = id;
+        });
+    </script>
+    <style>
+        textarea{
+            width: 50vh;
+        }
+        #sent{
+            text-align: right;
+        }
+    </style>
+</body>
+</html>
